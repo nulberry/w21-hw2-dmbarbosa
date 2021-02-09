@@ -3,6 +3,6 @@
 
 int main() {
 
-  printf("0.0\n");
+  printf("distance= 0.0\n");
   return(0);
 }
