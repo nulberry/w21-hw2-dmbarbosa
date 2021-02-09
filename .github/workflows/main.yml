@@ -1,0 +1,82 @@
+# This is a workflow to help you identify issues with your CMPUT391 code
+
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # install cppcheck
+      - name: install CPPcheck
+        run: sudo apt-get install -y cppcheck
+
+      - name: install valgrind
+        run: sudo apt-get install -y valgrind
+
+      - name: rename test database
+        run: mv q1/quad_cs.db q1/edmonton.db
+
+      - name: test q2
+        if: ${{ always() }}
+        run: |
+          cd q2
+          mkdir -p bin; mkdir -p obj
+          cppcheck ./src/solution.c -I./include
+          make test
+          valgrind --leak-check=yes --error-exitcode=1 ./bin/solution.out ../q1/edmonton.db 651244271 664182573
+          cd ..
+
+      - name: test q3
+        if: ${{ always() }}
+        run: |
+          cd q3
+          mkdir -p bin; mkdir -p obj
+          cppcheck ./src/solution.c -I./include
+          make test
+          valgrind --leak-check=yes --error-exitcode=1 ./bin/solution.out ../q1/edmonton.db amenity=bicycle_parking
+          cd ..
+
+      - name: test q4
+        if: ${{ always() }}
+        run: |
+          cd q4
+          mkdir -p bin; mkdir -p obj
+          cppcheck ./src/solution.c -I./include
+          make test
+          valgrind --leak-check=yes --error-exitcode=1 ./bin/solution.out ../q1/edmonton.db building=university wheelchair_accessible=yes
+          cd ..
+
+      - name: test q5
+        if: ${{ always() }}
+        run: |
+          cd q5
+          mkdir -p bin; mkdir -p obj
+          cppcheck ./src/solution.c -I./include
+          make test
+          valgrind --leak-check=yes --error-exitcode=1 ./bin/solution.out ../q1/edmonton.db ./test/nodes.tsv
+          cd ..
+
+      - name: test q6
+        if: ${{ always() }}
+        run: |
+          cd q6
+          mkdir -p bin; mkdir -p obj
+          cppcheck ./src/solution.c -I./include
+          make test
+          valgrind --leak-check=yes --error-exitcode=1 ./bin/solution.out ../q1/edmonton.db ./test/ways.tsv
+          cd ..
+
